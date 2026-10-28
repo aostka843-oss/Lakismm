@@ -1,47 +1,88 @@
 <!DOCTYPE html>
 <html lang="kk">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>LAKI SMM — Premium SMM</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#0b0b12;color:white;font-family:Arial,sans-serif}
-header{padding:22px;display:flex;justify-content:space-between;border-bottom:1px solid #29293a}
-.logo{font-size:25px;font-weight:bold;color:#b794ff}
-button{padding:13px 18px;border:0;border-radius:10px;background:#8b5cf6;color:white;font-weight:bold}
-.hero{text-align:center;padding:65px 20px}
-h1{font-size:42px;line-height:1.15}
-h1 span{color:#b794ff}
-p{color:#aaaabd;line-height:1.7}
-.container{padding:20px;max-width:950px;margin:auto}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:15px}
-.card{background:#171724;border:1px solid #303044;border-radius:17px;padding:22px;margin-bottom:10px}
-.card h3{margin-top:5px}
-.card p{font-size:14px}
-footer{text-align:center;padding:30px;color:#888}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAKI SMM - Premium SMM</title>
+    <style>
+        *{box-sizing:border-box}
+        body{margin:0;background:#0b0b12;color:white;font-family:Arial,sans-serif}
+        header{padding:22px;display:flex;justify-content:space-between;border-bottom:1px solid #303044;align-items:center}
+        .logo{font-size:25px;font-weight:bold;color:#b794ff}
+        .auth-form{display:flex;gap:10px;align-items:center}
+        input{padding:10px;border-radius:8px;border:1px solid #303044;background:#171724;color:white}
+        button{padding:11px 18px;border:0;border-radius:10px;background:#8b5cf6;color:white;font-weight:bold;cursor:pointer}
+        button:hover{background:#7c3aed}
+        .hero{text-align:center;padding:65px 20px}
+        h1{font-size:42px;line-height:1.15}
+        h1 span{color:#b794ff}
+        p{color:#aaaabd;line-height:1.7}
+        .container{padding:20px;max-width:950px;margin:auto}
+        .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:40px}
+        .card{background:#171724;border:1px solid #303044;border-radius:17px;padding:25px;text-align:center}
+        .card h3{margin-top:5px}
+        .card p{font-size:14px}
+        footer{text-align:center;padding:30px;color:#888}
+    </style>
 </head>
 <body>
-<header>
-<div class="logo">LAKI SMM</div>
-<button onclick="alert('Тіркелу жүйесі сервер қосылғанда іске қосылады')">Кіру / Тіркелу</button>
-</header>
-<section class="hero">
-<p>✦ ЖАҢА БУЫН SMM ПЛАТФОРМАСЫ</p>
-<h1>Әлеуметтік желіңді<br><span>жаңа деңгейге көтер!</span></h1>
-<p>Instagram, TikTok, YouTube және Telegram қызметтері бір жерде.</p>
-<button onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Қызметтерді көру ↓</button>
-</section>
-<main class="container" id="services">
-<h2>🔥 Танымал қызметтер</h2>
-<div class="grid">
-<div class="card"><h3>📸 Instagram</h3><p>Жазылушылар, лайктар және қаралымдар.</p><button onclick="alert('Instagram қызметтері кейін қосылады')">Таңдау</button></div>
-<div class="card"><h3>🎵 TikTok</h3><p>Видео қаралымдары мен белсенділік.</p><button onclick="alert('TikTok қызметтері кейін қосылады')">Таңдау</button></div>
-<div class="card"><h3>▶️ YouTube</h3><p>Видео мен арналарға арналған қызметтер.</p><button onclick="alert('YouTube қызметтері кейін қосылады')">Таңдау</button></div>
-<div class="card"><h3>✈️ Telegram</h3><p>Арналар мен аудиторияны дамыту.</p><button onclick="alert('Telegram қызметтері кейін қосылады')">Таңдау</button></div>
-</div>
-</main>
-<footer>© 2026 LAKI SMM</footer>
+    <header>
+        <div class="logo">LAKI SMM</div>
+        <!-- Тіркелу формасы -->
+        <div class="auth-form">
+            <input type="email" id="email" placeholder="Email жазыңыз">
+            <input type="password" id="password" placeholder="Құпия сөз">
+            <button onclick="signUp()">Тіркелу</button>
+        </div>
+    </header>
+    
+    <section class="hero">
+        <p>✨ ЖАҢА БУЫН SMM ПЛАТФОРМАСЫ</p>
+        <h1>Әлеуметтік желінді<br><span>жаңа деңгейге көтер!</span></h1>
+        <p>Instagram, TikTok, YouTube және Telegram қызметтері бір жерде.</p>
+        <button onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">Танымал қызметтер</button>
+    </section>
+
+    <main class="container" id="services">
+        <h2>🚀 Танымал қызметтер</h2>
+        <div class="grid">
+            <div class="card"><h3>❤️ Instagram</h3><p>Жазылушылар, лайктар және қамтуды (охват) өсіру</p></div>
+            <div class="card"><h3>🎵 TikTok</h3><p>Видео қаралымдары мен белсенділікті арттыру</p></div>
+            <div class="card"><h3>▶️ YouTube</h3><p>Видео мен арналарға арналған көрермендер</p></div>
+            <div class="card"><h3>📢 Telegram</h3><p>Арналар bandwidth пен аудиторияны дамыту</p></div>
+        </div>
+    </main>
+
+    <footer>© 2026 LAKI SMM</footer>
+
+    <!-- Supabase кітапханасы -->
+    <script src="https://jsdelivr.net"></script>
+    <script>
+      const SUPABASE_URL = 'https://supabase.co'; 
+      const SUPABASE_ANON_KEY = 'sb_publishable_MRAMU4BMBUQTVnI3STQwdzlFNGZqd3loZUpVcU9uclV2NDcxeW16M1NreC04';
+      const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      // Пайдаланушыны тіркеу функциясы
+      async function signUp() {
+          const email = document.getElementById('email').value;
+          const password = document.getElementById('password').value;
+
+          if(!email || !password) {
+              alert('Email мен құпия сөзді жазыңыз!');
+              return;
+          }
+
+          const { data, error } = await supabase.auth.signUp({
+              email: email,
+              password: password,
+          });
+
+          if (error) {
+              alert('Қате шықты: ' + error.message);
+          } else {
+              alert('Тіркелу сәтті өтті! Поштаңызға (Email) растау хаты жіберілуі мүмкін.');
+          }
+      }
+    </script>
 </body>
 </html>
