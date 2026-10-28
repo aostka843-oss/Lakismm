@@ -1,329 +1,544 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LAKI SMM — Панель Автоматической Накрутки</title>
-    <!-- Подключение премиум шрифта Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://googleapis.com">
-    <link rel="preconnect" href="https://gstatic.com" crossorigin>
-    <link href="https://googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <style>
-        :root {
-            --bg-main: #06060c;
-            --bg-card: #0d0d1a;
-            --bg-input: #121224;
-            --accent: #8b5cf6;
-            --accent-hover: #7c3aed;
-            --text-main: #ffffff;
-            --text-muted: #94a3b8;
-            --success: #10b981;
-            --danger: #f43f5e;
-            --border: rgba(255, 255, 255, 0.06);
-            --font: 'Plus Jakarta Sans', sans-serif;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; font-family: var(--font); -webkit-font-smoothing: antialiased; }
-        body { background-color: var(--bg-main); color: var(--text-main); line-height: 1.5; }
-
-        header {
-            display: flex; justify-content: space-between; align-items: center; padding: 16px 24px;
-            background: rgba(13, 13, 26, 0.8); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border);
-            position: sticky; top: 0; z-index: 100;
-        }
-
-        .logo { font-size: 24px; font-weight: 800; color: var(--text-main); }
-        .logo span { color: var(--accent); }
-
-        .auth-container, .user-navbar { display: flex; gap: 12px; align-items: center; }
-
-        @media (max-width: 640px) {
-            header { flex-direction: column; gap: 16px; padding: 16px; }
-            .auth-container, .user-navbar { width: 100%; justify-content: center; flex-wrap: wrap; }
-        }
-
-        input, select {
-            width: 100%; padding: 12px 16px; background: var(--bg-input); border: 1px solid var(--border);
-            border-radius: 10px; color: var(--text-main); font-size: 14px; font-weight: 500; outline: none; transition: 0.2s;
-        }
-        input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15); }
-
-        button {
-            padding: 12px 24px; border: none; border-radius: 10px; font-size: 14px; font-weight: 600;
-            cursor: pointer; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-        }
-
-        .btn-primary { background: var(--accent); color: white; box-shadow: 0 4px 12px rgba(139, 92, 246, 0.25); }
-        .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); }
-        .btn-secondary { background: rgba(255, 255, 255, 0.05); color: var(--text-main); border: 1px solid var(--border); }
-        .btn-danger { background: var(--danger); color: white; }
-
-        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
-        .hero { text-align: center; padding: 30px 20px; max-width: 700px; margin: 0 auto; }
-        .hero .badge-top { display: inline-block; padding: 6px 12px; background: rgba(139, 92, 246, 0.1); border: 1px solid rgba(139, 92, 246, 0.2); color: #c084fc; border-radius: 100px; font-size: 12px; font-weight: 700; margin-bottom: 16px; }
-        .hero h1 { font-size: 42px; font-weight: 800; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 12px; }
-        .hero h1 span { background: linear-gradient(to right, #b794ff, #8b5cf6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .hero p { color: var(--text-muted); font-size: 15px; }
-
-        .main-grid { display: grid; grid-template-columns: 1fr; gap: 24px; margin-top: 32px; }
-        @media (min-width: 768px) { .main-grid { grid-template-columns: 1.5fr 1fr; } }
-
-        .card-panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px; height: fit-content; }
-        .card-panel h2 { font-size: 18px; font-weight: 700; margin-bottom: 18px; color: #b794ff; display: flex; align-items: center; gap: 10px; }
-        
-        .form-group { margin-bottom: 16px; }
-        .form-group label { display: block; font-size: 13px; font-weight: 600; color: var(--text-muted); margin-bottom: 6px; }
-
-        .table-responsive { width: 100%; overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); background: rgba(255, 255, 255, 0.01); margin-top: 16px; }
-        table { width: 100%; border-collapse: collapse; font-size: 14px; text-align: left; }
-        th { background: rgba(255, 255, 255, 0.03); padding: 14px 16px; font-weight: 600; color: var(--text-muted); border-bottom: 1px solid var(--border); }
-        td { padding: 14px 16px; border-bottom: 1px solid var(--border); color: #e2e8f0; }
-
-        .status-badge { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: 6px; font-size: 12px; font-weight: 600; }
-        .status-badge.pending { background: rgba(245, 158, 11, 0.1); color: #fbbf24; }
-
-        .card-display { background: rgba(16, 185, 129, 0.04); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; padding: 16px; margin-bottom: 16px; text-align: center; }
-        .card-number { font-size: 20px; font-weight: 800; color: #ffffff; letter-spacing: 1px; margin: 8px 0; background: #121224; padding: 10px; border-radius: 8px; border: 1px solid var(--border); }
-
-        .admin-section { display: none; border: 1px solid rgba(244, 63, 94, 0.3); background: #110709; margin-top: 32px; }
-        footer { text-align: center; padding: 40px; color: var(--text-muted); font-size: 13px; border-top: 1px solid var(--border); margin-top: 40px; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>LAKI SMM — Продвижение в социальных сетях</title>
+<style>
+:root {
+  --bg:#090910;
+  --panel:#12121e;
+  --border:#29293e;
+  --purple:#9b5cff;
+  --text:#f7f5ff;
+  --muted:#9694ad;
+  --green:#42dda0;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:var(--bg);color:var(--text);
+  font-family:Arial,sans-serif;
+}
+button,input,select{font:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.container{max-width:1200px;margin:auto;padding:20px}
+header{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:18px 0;border-bottom:1px solid var(--border);gap:12px;
+}
+.logo{font-size:27px;font-weight:900;letter-spacing:1px}
+.logo span{color:var(--purple)}
+.btn{
+  background:linear-gradient(135deg,#a65cff,#7138d8);
+  color:white;border:0;border-radius:10px;padding:12px 17px;
+  font-weight:bold;
+}
+.btn.secondary{background:#222237;border:1px solid var(--border)}
+.btn.danger{background:#692c3b}
+.hero{
+  text-align:center;padding:65px 15px 45px;
+  background:radial-gradient(ellipse at top,#291342,transparent 70%);
+}
+.hero h1{font-size:clamp(35px,6vw,62px);margin:18px 0}
+.hero h1 span{color:var(--purple)}
+.hero p{color:var(--muted);line-height:1.7;max-width:650px;margin:0 auto 25px}
+.badge{
+  display:inline-block;padding:8px 13px;border-radius:30px;
+  border:1px solid #5d358b;color:#d5b9ff;font-size:13px;
+}
+.grid{display:grid;gap:15px}
+.stats{grid-template-columns:repeat(4,1fr);margin:22px 0}
+.panel,.card{
+  background:linear-gradient(145deg,#171725,#101019);
+  border:1px solid var(--border);border-radius:16px;padding:20px;
+}
+.label{font-size:13px;color:var(--muted)}
+.number{font-size:26px;font-weight:bold;margin-top:10px}
+.green{color:var(--green)}
+.section-title{
+  display:flex;justify-content:space-between;align-items:center;
+  gap:12px;margin:30px 0 16px;
+}
+.section-title h2{font-size:23px;margin:0}
+.services{grid-template-columns:repeat(3,1fr)}
+.card{transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:var(--purple)}
+.icon{font-size:32px;margin-bottom:14px}
+.card h3{margin:0 0 10px}
+.card p{color:var(--muted);font-size:14px;line-height:1.6;min-height:42px}
+.price{font-size:21px;font-weight:bold;color:#d3b3ff;margin:16px 0}
+.card button{width:100%}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:25px 0}
+.tab{
+  border:1px solid var(--border);background:#171725;color:#c8c5da;
+  padding:11px 14px;border-radius:10px;
+}
+.tab.active{background:#38234f;border-color:var(--purple);color:white}
+.field{
+  width:100%;background:#0b0b13;border:1px solid #37374f;
+  color:white;border-radius:9px;padding:13px;margin:7px 0 15px;
+  outline:none;
+}
+.field:focus{border-color:var(--purple)}
+label{color:var(--muted);font-size:13px}
+.notice{
+  background:#211832;border:1px solid #573b7b;color:#ddcaff;
+  padding:13px;border-radius:10px;font-size:13px;line-height:1.6;
+}
+table{width:100%;border-collapse:collapse;min-width:650px}
+th,td{text-align:left;padding:13px 10px;border-bottom:1px solid var(--border);font-size:13px}
+th{color:var(--muted)}
+.table-wrap{overflow:auto}
+.status{display:inline-block;padding:5px 9px;border-radius:20px;background:#39301a;color:#f6d58b;font-size:12px}
+.status.done{background:#16382d;color:#8cebbd}
+.status.cancel{background:#43202a;color:#ff9eac}
+.auth{
+  min-height:100vh;display:grid;place-items:center;padding:20px;
+  background:radial-gradient(ellipse at top,#291342,transparent 65%),var(--bg);
+}
+.authbox{
+  width:min(430px,100%);background:var(--panel);border:1px solid var(--border);
+  border-radius:20px;padding:30px;
+}
+.authbox h1{margin-bottom:8px}
+.muted{color:var(--muted)}
+.small{font-size:12px}
+a{color:#cba6ff}
+footer{text-align:center;color:#77748a;padding:35px 10px;font-size:12px}
+@media(max-width:800px){
+ .stats{grid-template-columns:repeat(2,1fr)}
+ .services{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:520px){
+ .container{padding:13px}
+ .services{grid-template-columns:1fr}
+ .hero{padding-top:40px}
+ .panel,.card{padding:16px}
+ .number{font-size:21px}
+}
+</style>
 </head>
 <body>
 
-    <!-- НАВИГАЦИЯ -->
-    <header>
-        <div class="logo">LAKI<span>SMM</span></div>
-        
-        <div id="authContainer" class="auth-container">
-            <input type="email" id="inputEmail" placeholder="Email" style="width: 150px; margin: 0;">
-            <input type="password" id="inputPassword" placeholder="Пароль" style="width: 130px; margin: 0;">
-            <button class="btn-primary" onclick="processAuth()">Вход / Регистрация</button>
-        </div>
+<!-- СТРАНИЦА ВХОДА -->
+<div id="authPage" class="auth">
+  <div class="authbox">
+    <div class="logo">LAKI <span>SMM</span></div>
+    <h1 id="authTitle">Добро пожаловать!</h1>
+    <p class="muted">Панель продвижения социальных сетей.</p>
 
-        <div id="userNavbar" class="user-navbar" style="display: none;">
-            <span id="labelUserEmail" style="color: var(--text-muted); font-size: 14px;"></span>
-            <div style="background: rgba(16, 185, 129, 0.1); padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(16, 185, 129, 0.2); text-align: right;">
-                <span style="font-size: 10px; font-weight:600; color: var(--success); display:block; line-height:1; margin-bottom: 2px;">Баланс</span>
-                <span style="font-weight: 800; font-size: 16px; color: #ffffff;"><span id="valBalance">0</span> ₸</span>
-            </div>
-            <button class="btn-secondary" onclick="processLogout()">Выйти</button>
-        </div>
-    </header>
+    <form id="authForm">
+      <label>Email</label>
+      <input class="field" id="email" type="email" required placeholder="Введите email">
 
-    <div class="container">
-        <section class="hero">
-            <div class="badge-top">🤖 САМАЯ ДЕШЕВАЯ АВТО-НАКРУТКА</div>
-            <h1>Накрутка соцсетей <span>без посредников</span></h1>
-            <p>Моментальный запуск заказов через прямое API провайдеров по оптовым ценам.</p>
-        </section>
+      <label>Пароль</label>
+      <input class="field" id="password" type="password" minlength="6" required placeholder="Минимум 6 символов">
 
-        <div class="main-grid">
-            <!-- ФОРМА ЗАКАЗА НАКРУТКИ -->
-            <div class="card-panel">
-                <h2>🚀 Создать заказ на накрутку</h2>
-                
-                <div class="form-group">
-                    <label>Выберите платформу:</label>
-                    <select id="selectNetwork" onchange="renderServicesDropdown()">
-                        <option value="instagram">Instagram</option>
-                        <option value="tiktok">TikTok</option>
-                        <option value="youtube">YouTube</option>
-                        <option value="telegram">Telegram</option>
-                    </select>
-                </div>
+      <button class="btn" id="authButton" style="width:100%">Войти</button>
+    </form>
 
-                <div class="form-group">
-                    <label>Выберите самую дешевую услугу:</label>
-                    <select id="selectService" onchange="recalculateCost()"></select>
-                </div>
+    <p class="small muted">
+      <span id="toggleText">Нет аккаунта?</span>
+      <a href="#" id="toggleAuth">Зарегистрироваться</a>
+    </p>
 
-                <div class="form-group">
-                    <label>Ссылка (Профиль / Видео / Пост):</label>
-                    <input type="text" id="fieldLink" placeholder="https://...">
-                </div>
+    <div class="notice">
+      <b>Демо-администратор</b><br>
+      Email: admin@laki.local<br>
+      Пароль: admin777
+    </div>
+    <p class="small muted">Демо-версия. Не используйте реальные пароли.</p>
+  </div>
+</div>
 
-                <div class="form-group">
-                    <label>Количество (Объем):</label>
-                    <input type="number" id="fieldQty" value="1000" min="100" oninput="recalculateCost()">
-                </div>
+<!-- ОСНОВНОЙ САЙТ -->
+<div id="mainPage" class="hidden">
+<div class="container">
 
-                <div style="background: rgba(255,255,255,0.02); padding: 16px; border-radius: 10px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; border: 1px dashed var(--border);">
-                    <span style="font-size: 14px; color: var(--text-muted);">Стоимость к списанию:</span>
-                    <span style="font-size: 20px; font-weight: 800; color: #b794ff;"><span id="textTotalCost">0.00</span> ₸</span>
-                </div>
+<header>
+  <div>
+    <div class="logo">LAKI <span>SMM</span></div>
+    <div class="small muted">Профессиональное продвижение</div>
+  </div>
+  <div style="text-align:right">
+    <div class="small muted" id="userEmail"></div>
+    <button class="btn secondary" id="logout" style="margin-top:7px">Выйти</button>
+  </div>
+</header>
 
-                <button class="btn-primary" style="width: 100%; padding: 14px;" onclick="submitOrder()">Запустить авто-накрутку</button>
-            </div>
+<section class="hero">
+  <span class="badge">⚡ SMM-ПЛАТФОРМА</span>
+  <h1>Продвигайся <span>быстрее</span></h1>
+  <p>Управляй заказами и услугами социальных сетей в одном месте. Удобный интерфейс, история заказов и контроль баланса.</p>
+  <button class="btn" onclick="openTab('catalog')">Выбрать услугу →</button>
+</section>
 
-            <!-- ПОПОЛНЕНИЕ НА ТВОЮ КАРТУ -->
-            <div class="card-panel">
-                <h2>💳 Пополнение баланса (Kaspi)</h2>
-                
-                <div class="card-display">
-                    <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Переведите деньги на карту владельца:</span>
-                    <div class="card-number" id="ownerCard">4400 4306 9526 4207</div>
-                    <span style="font-size: 12px; color: var(--success); font-weight: 700;">● Kaspi Gold (Принимает платежи 24/7)</span>
-                </div>
+<div class="grid stats">
+  <div class="panel">
+    <div class="label">Мой баланс</div>
+    <div class="number green" id="balance">0 ₸</div>
+  </div>
+  <div class="panel">
+    <div class="label">Всего заказов</div>
+    <div class="number" id="orderCount">0</div>
+  </div>
+  <div class="panel">
+    <div class="label">В обработке</div>
+    <div class="number" id="activeCount">0</div>
+  </div>
+  <div class="panel">
+    <div class="label">Аккаунт</div>
+    <div class="number" style="font-size:20px">Активен ✓</div>
+  </div>
+</div>
 
-                <div class="form-group">
-Какую сумму вы перевели (₸):
-Номер транзакции из чека Kaspi (ID):
-Я оплатил, проверить чек
+<nav class="tabs">
+  <button class="tab active" data-tab="catalog">Каталог услуг</button>
+  <button class="tab" data-tab="orders">Мои заказы</button>
+  <button class="tab" data-tab="balancePage">Баланс</button>
+  <button class="tab hidden" id="adminTab" data-tab="admin">Админ-панель</button>
+</nav>
 
-📋 Ваши заказы в системе API
+<!-- КАТАЛОГ -->
+<section id="catalog">
+  <div class="section-title">
+    <h2>Популярные услуги</h2>
+    <span class="small muted">Каталог SMM</span>
+  </div>
+  <div class="grid services" id="serviceGrid"></div>
+</section>
 
-ID Заказа	Сеть	Тип накрутки	Ссылка	Количество	Цена	Статус исполнения
-Авторизуйтесь, чтобы увидеть свои заказы и запустить накрутку.
+<!-- ЗАКАЗЫ -->
+<section id="orders" class="hidden">
+  <div class="section-title">
+    <h2>История заказов</h2>
+    <button class="btn secondary" onclick="render()">Обновить</button>
+  </div>
+  <div class="panel table-wrap" id="ordersTable"></div>
+</section>
 
-⚙️ Панель Управления Владельца (ADMIN)
+<!-- БАЛАНС -->
+<section id="balancePage" class="hidden">
+  <div class="section-title"><h2>Пополнение баланса</h2></div>
+  <div class="panel" style="max-width:650px">
+    <p class="muted">Создайте заявку на пополнение баланса.</p>
+    <label>Сумма пополнения, ₸</label>
+    <input class="field" type="number" id="topupAmount" min="500" max="10000000" value="1000">
+    <label>Способ оплаты</label>
+    <select class="field" id="paymentMethod">
+      <option>Kaspi — ручное подтверждение</option>
+      <option>Другой способ оплаты</option>
+    </select>
+    <button class="btn" onclick="topup()">Создать заявку</button>
+    <div id="topupResult" style="margin-top:15px"></div>
+    <div class="notice" style="margin-top:15px">
+      Реальная оплата Kaspi пока не подключена. Создание заявки не означает, что деньги переведены или зачислены.
+    </div>
+  </div>
+</section>
 
-Пользователь	Текущий Баланс	Роль	Управление
-admin@laki-smm.local	1 000 000.00 ₸	Владелец сайта	Защищено
+<!-- АДМИН-ПАНЕЛЬ -->
+<section id="admin" class="hidden">
+  <div class="section-title"><h2>Админ-панель</h2></div>
+  <div class="notice">Демо-режим: данные хранятся только в текущем браузере. Не публикуйте такую авторизацию как production-систему.</div>
 
-© 2026 LAKI SMM. Прямое соединение с серверами накрутки.
-const CORE_SUPABASE_URL = 'supabase.co';
-const CORE_SUPABASE_KEY = 'sb_publishable_MRAMU4BMBUQTVnI3STQwdzlFNGZqd3loZUpVcU9uclV2NDcxeW16M1NreC04';
-const instanceSupabase = supabase.createClient(CORE_SUPABASE_URL, CORE_SUPABASE_KEY);
-// ОПТОВЫЕ, САМЫЕ ИЗНАЧАЛЬНО ДЕШЕВЫЕ ЦЕНЫ ЗА 1000 ШТУК (Пункт ТЗ №10)
-const CATALOG_SERVICES = {
-instagram: [
-{ id: 101, name: "Instagram Лайки [Самые дешевые / Быстрые]", price: 90, min: 100, max: 100000 },
-{ id: 102, name: "Instagram Подписчики [Эконом-микс / Без дропов]", price: 290, min: 100, max: 50000 }
-],
-tiktok: [
-{ id: 201, name: "TikTok Просмотры [Супер-дешево / Лездике]", price: 15, min: 500, max: 500000 },
-{ id: 202, name: "TikTok Подписчики [Реальные боты]", price: 490, min: 100, max: 20000 }
-],
-youtube: [
-{ id: 301, name: "YouTube Просмотры [Быстрый старт / Эконом]", price: 450, min: 500, max: 100000 }
-],
-telegram: [
-{ id: 401, name: "Telegram Просмотры постов [Дешевые авто-просмотры]", price: 10, min: 100, max: 50000 },
-{ id: 402, name: "Telegram Подписчики в Канал [Микс-аккаунты]", price: 250, min: 100, max: 30000 }
-]
+  <div class="section-title"><h2>Заказы</h2></div>
+  <div class="panel table-wrap" id="adminOrders"></div>
+
+  <div class="section-title"><h2>Пользователи</h2></div>
+  <div class="panel table-wrap" id="adminUsers"></div>
+</section>
+
+<footer>© 2026 LAKI SMM. Все права защищены.</footer>
+</div>
+</div>
+
+<script>
+const KEY = "laki_smm_database_v1";
+const ADMIN = "admin@laki.local";
+const ADMIN_PASSWORD = "admin777";
+
+const services = [
+ {id:"tiktok_views",icon:"🎵",name:"TikTok — просмотры",desc:"Услуга продвижения видео TikTok.",price:250},
+ {id:"tiktok_followers",icon:"👥",name:"TikTok — подписчики",desc:"Услуга продвижения аккаунта.",price:500},
+ {id:"instagram_likes",icon:"❤️",name:"Instagram — лайки",desc:"Услуга для публикаций Instagram.",price:350},
+ {id:"instagram_followers",icon:"📸",name:"Instagram — подписчики",desc:"Услуга продвижения профиля.",price:700},
+ {id:"youtube_views",icon:"▶️",name:"YouTube — просмотры",desc:"Услуга продвижения видео YouTube.",price:900},
+ {id:"telegram_members",icon:"✈️",name:"Telegram — участники",desc:"Услуга для Telegram-каналов.",price:800}
+];
+
+let registerMode = false;
+let currentUser = null;
+
+function dbRead(){
+  try{
+    return JSON.parse(localStorage.getItem(KEY)) || {users:[],orders:[],topups:[]};
+  }catch(e){
+    return {users:[],orders:[],topups:[]};
+  }
+}
+function dbSave(db){
+  localStorage.setItem(KEY,JSON.stringify(db));
+}
+function init(){
+  const db=dbRead();
+  if(!db.users.some(u=>u.email===ADMIN)){
+    db.users.push({
+      id:"admin",
+      email:ADMIN,
+      password:ADMIN_PASSWORD,
+      balance:100000,
+      role:"admin",
+      created:new Date().toISOString()
+    });
+    dbSave(db);
+  }
+}
+function money(n){
+  return Number(n||0).toLocaleString("ru-RU")+" ₸";
+}
+function safe(s){
+  return String(s).replace(/[&<>"']/g,c=>({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  })[c]);
+}
+function userNow(){
+  const db=dbRead();
+  return db.users.find(u=>u.id===currentUser.id);
+}
+
+document.getElementById("toggleAuth").onclick=function(e){
+  e.preventDefault();
+  registerMode=!registerMode;
+  document.getElementById("authTitle").textContent=registerMode?"Создание аккаунта":"Добро пожаловать!";
+  document.getElementById("authButton").textContent=registerMode?"Зарегистрироваться":"Войти";
+  document.getElementById("toggleText").textContent=registerMode?"Уже есть аккаунт?":"Нет аккаунта?";
+  document.getElementById("toggleAuth").textContent=registerMode?"Войти":"Зарегистрироваться";
 };
-let sessionUser = null;
-let globalAccountBalance = 0;
-let internalOrdersLogs = [];
-function renderServicesDropdown() {
-const currentNetwork = document.getElementById('selectNetwork').value;
-const dropdown = document.getElementById('selectService');
-dropdown.innerHTML = '';
-CATALOG_SERVICES[currentNetwork].forEach(service => {
-let option = document.createElement('option');
-option.value = service.id;
-option.dataset.price = service.price;
-option.textContent = ${service.name} — ${service.price} ₸ за 1000 шт.;
-dropdown.appendChild(option);
-});
-recalculateCost();
-}
-function recalculateCost() {
-const dropdown = document.getElementById('selectService');
-if(dropdown.options.length === 0) return;
-const selectedItem = dropdown.options[dropdown.selectedIndex];
-const ratePer1k = parseFloat(selectedItem.dataset.price);
-const quantity = parseInt(document.getElementById('fieldQty').value) || 0;
-const total = (ratePer1k / 1000) * quantity;
-document.getElementById('textTotalCost').textContent = total.toFixed(2);
-}
-function processAuth() {
-const email = document.getElementById('inputEmail').value.trim();
-const password = document.getElementById('inputPassword').value.trim();
-if(!email || !password) { alert('Введите корректные данные для входа!'); return; }
-if(email === 'admin@laki-smm.local' && password === 'LakiAdmin2026!') {
-sessionUser = email;
-globalAccountBalance = 1000000;
-document.getElementById('panelAdmin').style.display = 'block';
-alert('Вы вошли как Главный Администратор (Владелец)!');
-} else {
-sessionUser = email;
-globalAccountBalance = 0;
-document.getElementById('panelAdmin').style.display = 'none';
-alert('Профиль пользователя успешно создан в системе!');
-}
-synchronizeUserInterface();
-}
-function synchronizeUserInterface() {
-if(sessionUser) {
-document.getElementById('authContainer').style.display = 'none';
-document.getElementById('userNavbar').style.display = 'flex';
-document.getElementById('labelUserEmail').textContent = sessionUser;
-document.getElementById('valBalance').textContent = globalAccountBalance.toLocaleString('fiat', {minimumFractionDigits: 2});
-refreshOrdersTable();
-}
-}
-function processLogout() {
-sessionUser = null;
-globalAccountBalance = 0;
-document.getElementById('authContainer').style.display = 'flex';
-document.getElementById('userNavbar').style.display = 'none';
-document.getElementById('panelAdmin').style.display = 'none';
-document.getElementById('tableOrdersHistory').innerHTML = <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">Авторизуйтесь, чтобы увидеть свои заказы и запустить накрутку.</td></tr>;
-}
-// РАБОТА С ЧЕКАМИ — ПОСТУПЛЕНИЕ НА ТВОЮ КАРТУ
-function submitPayment() {
-if(!sessionUser) { alert('Для зачисления платежа сначала войдите в аккаунт!'); return; }
-const depositAmount = parseFloat(document.getElementById('fieldAmount').value);
-const kaspiTxId = document.getElementById('fieldKaspiTx').value.trim();
-if(!kaspiTxId) { alert('Введите ID транзакции для проверки владельцем сайта!'); return; }
-// Логика зачисления баланса на сервере
-globalAccountBalance += depositAmount;
-document.getElementById('valBalance').textContent = globalAccountBalance.toLocaleString('fiat', {minimumFractionDigits: 2});
-alert(Уведомление отправлено! После подтверждения получения перевода на карту 4400... ваши ${depositAmount} ₸ будут окончательно подтверждены.);
-}
-// ЗАПУСК РЕАЛЬНОГО API ЗАКАЗА (Пункт ТЗ №11, №12, №13)
-function submitOrder() {
-if(!sessionUser) { alert('Авторизуйтесь для запуска авто-накрутки!'); return; }
-const network = document.getElementById('selectNetwork').value;
-const dropdown = document.getElementById('selectService');
-const selectedOption = dropdown.options[dropdown.selectedIndex];
-const targetLink = document.getElementById('fieldLink').value.trim();
-const qty = parseInt(document.getElementById('fieldQty').value) || 0;
-const finalCost = (parseFloat(selectedOption.dataset.price) / 1000) * qty;
-if (!targetLink.toLowerCase().includes(network)) {
-alert(Ошибка ссылки! URL адрес должен содержать ключевое слово платформы [${network}].);
-return;
-}
-if(globalAccountBalance < finalCost) {
-alert('Недостаточно средств на балансе для отправки запроса провайдеру накрутки!');
-return;
-}
-globalAccountBalance -= finalCost;
-document.getElementById('valBalance').textContent = globalAccountBalance.toLocaleString('fiat', {minimumFractionDigits: 2});
-// Формирование структуры реального API запроса (Пункт ТЗ №12)
-const orderStructure = {
-uid: Math.floor(Math.random() * 900000) + 100000,
-platform: network.toUpperCase(),
-desc: selectedOption.textContent.split('—')[0],
-url: targetLink,
-quantity: qty,
-cost: finalCost.toFixed(2),
-status: 'In progress' // Начальный статус по ТЗ
+
+document.getElementById("authForm").onsubmit=function(e){
+  e.preventDefault();
+  const email=document.getElementById("email").value.trim().toLowerCase();
+  const password=document.getElementById("password").value;
+  const db=dbRead();
+
+  if(registerMode){
+    if(db.users.some(u=>u.email===email)){
+      alert("Этот email уже зарегистрирован.");
+      return;
+    }
+    if(password.length<6){
+      alert("Пароль должен содержать минимум 6 символов.");
+      return;
+    }
+    const user={
+      id:"user_"+Date.now(),
+      email,
+      password,
+      balance:0,
+      role:"user",
+      created:new Date().toISOString()
+    };
+    db.users.push(user);
+    dbSave(db);
+    currentUser=user;
+    enterSite();
+  }else{
+    const user=db.users.find(u=>u.email===email&&u.password===password);
+    if(!user){
+      alert("Неверный email или пароль.");
+      return;
+    }
+    currentUser=user;
+    enterSite();
+  }
 };
-internalOrdersLogs.unshift(orderStructure);
-refreshOrdersTable();
-alert('Запрос успешно перенаправлен на шлюз накрутки! Старт в течение 1-15 минут.');
+
+function enterSite(){
+  document.getElementById("authPage").classList.add("hidden");
+  document.getElementById("mainPage").classList.remove("hidden");
+  document.getElementById("userEmail").textContent=currentUser.email;
+  document.getElementById("adminTab").classList.toggle("hidden",currentUser.role!=="admin");
+  drawServices();
+  render();
+  openTab("catalog");
 }
-function refreshOrdersTable() {
-const tableBody = document.getElementById('tableOrdersHistory');
-tableBody.innerHTML = '';
-if(internalOrdersLogs.length === 0) {
-tableBody.innerHTML = <tr><td colspan="7" style="text-align: center; color: var(--text-muted); padding: 30px;">Журнал заказов пуст. Сделайте первый заказ выше.</td></tr>;
-return;
-}
-internalOrdersLogs.forEach(item => {
-tableBody.innerHTML += `
-#${item.uid}
-${item.platform}
-${item.desc}
-Открыть ссылку
-${item.quantity}
-${item.cost} ₸
-В процессе
-`;
+
+document.getElementById("logout").onclick=function(){
+  currentUser=null;
+  document.getElementById("mainPage").classList.add("hidden");
+  document.getElementById("authPage").classList.remove("hidden");
+};
+
+document.querySelectorAll("[data-tab]").forEach(btn=>{
+  btn.onclick=()=>openTab(btn.dataset.tab);
 });
+
+function openTab(tab){
+  if(tab==="admin"&&currentUser.role!=="admin")return;
+  ["catalog","orders","balancePage","admin"].forEach(id=>{
+    document.getElementById(id).classList.toggle("hidden",id!==tab);
+  });
+  document.querySelectorAll("[data-tab]").forEach(btn=>{
+    btn.classList.toggle("active",btn.dataset.tab===tab);
+  });
+  render();
 }
-renderServicesDropdown();
+
+function drawServices(){
+  document.getElementById("serviceGrid").innerHTML=services.map(s=>`
+    <div class="card">
+      <div class="icon">${s.icon}</div>
+      <h3>${s.name}</h3>
+      <p>${s.desc}</p>
+      <div class="price">${money(s.price)} <span class="small muted">/ 1 000</span></div>
+      <button class="btn" onclick="makeOrder('${s.id}')">Оформить заказ</button>
+    </div>
+  `).join("");
+}
+
+function makeOrder(id){
+  const service=services.find(s=>s.id===id);
+  const url=prompt("Введите ссылку на профиль, видео или публикацию:");
+  if(url===null)return;
+
+  if(!/^https?:\/\/\S+/i.test(url.trim())){
+    alert("Введите действительную ссылку с http:// или https://");
+    return;
+  }
+
+  const quantity=Number(prompt("Количество (от 100 до 100 000):","1000"));
+  if(!Number.isInteger(quantity)||quantity<100||quantity>100000){
+    alert("Количество должно быть от 100 до 100 000.");
+    return;
+  }
+
+  const cost=Math.ceil(service.price*quantity/1000);
+  const db=dbRead();
+  const user=db.users.find(u=>u.id===currentUser.id);
+
+  if(!user||user.balance<cost){
+    alert("Недостаточно средств. Необходимо: "+money(cost));
+    openTab("balancePage");
+    return;
+  }
+
+  user.balance-=cost;
+  db.orders.unshift({
+    id:"LS"+Date.now(),
+    userId:user.id,
+    email:user.email,
+    service:service.name,
+    url:url.trim(),
+    quantity,
+    cost,
+    status:"Ожидает обработки",
+    created:new Date().toISOString()
+  });
+
+  dbSave(db);
+  currentUser=user;
+  render();
+  alert("Заказ создан. В этой версии он сохранён в системе, но не отправлен реальному поставщику.");
+  openTab("orders");
+}
+
+function renderOrders(){
+  const db=dbRead();
+  const list=db.orders.filter(o=>o.userId===currentUser.id);
+  document.getElementById("orderCount").textContent=list.length;
+  document.getElementById("activeCount").textContent=list.filter(o=>o.status==="Ожидает обработки"||o.status==="В обработке").length;
+
+  if(!list.length){
+    document.getElementById("ordersTable").innerHTML='<p class="muted">У вас пока нет заказов.</p>';
+    return;
+  }
+  document.getElementById("ordersTable").innerHTML=orderTable(list,false);
+}
+
+function orderTable(list,isAdmin){
+  if(!list.length)return "<p class='muted'>Заказов пока нет.</p>";
+  return `<table><thead><tr>
+    ${isAdmin?"<th>Пользователь</th>":""}
+    <th>Номер</th><th>Услуга</th><th>Количество</th><th>Сумма</th><th>Статус</th>
+    ${isAdmin?"<th>Изменить</th>":""}
+    <th>Дата</th>
+  </tr></thead><tbody>${list.map(o=>`
+    <tr>
+      ${isAdmin?`<td>${safe(o.email)}</td>`:""}
+      <td>${safe(o.id)}<br><a href="${safe(o.url)}" target="_blank" rel="noopener">Открыть</a></td>
+      <td>${safe(o.service)}</td>
+      <td>${o.quantity.toLocaleString("ru-RU")}</td>
+      <td>${money(o.cost)}</td>
+      <td><span class="status ${o.status==="Выполнен"?"done":o.status==="Отменён"?"cancel":""}">${safe(o.status)}</span></td>
+      ${isAdmin?`<td><select class="field" onchange="setStatus('${o.id}',this.value)">
+      ${["Ожидает обработки","В обработке","Выполнен","Отменён"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}
+      </select></td>`:""}
+      <td>${new Date(o.created).toLocaleString("ru-RU")}</td>
+    </tr>`).join("")}</tbody></table>`;
+}
+
+function renderAdmin(){
+  const db=dbRead();
+  document.getElementById("adminOrders").innerHTML=orderTable(db.orders,true);
+  document.getElementById("adminUsers").innerHTML=db.users.length?`
+    <table><thead><tr><th>Email</th><th>Роль</th><th>Баланс</th><th>Дата регистрации</th></tr></thead>
+    <tbody>${db.users.map(u=>`<tr>
+      <td>${safe(u.email)}</td>
+      <td>${u.role==="admin"?"Администратор":"Пользователь"}</td>
+      <td>${money(u.balance)}</td>
+      <td>${new Date(u.created).toLocaleDateString("ru-RU")}</td>
+    </tr>`).join("")}</tbody></table>`:"<p>Пользователей нет.</p>";
+}
+
+function setStatus(id,status){
+  if(currentUser.role!=="admin")return;
+  const db=dbRead();
+  const order=db.orders.find(o=>o.id===id);
+  if(order){
+    order.status=status;
+    dbSave(db);
+    render();
+  }
+}
+
+function topup(){
+  const amount=Number(document.getElementById("topupAmount").value);
+  const method=document.getElementById("paymentMethod").value;
+
+  if(!Number.isFinite(amount)||amount<500||amount>10000000){
+    alert("Введите сумму от 500 до 10 000 000 ₸.");
+    return;
+  }
+
+  const db=dbRead();
+  db.topups.unshift({
+    id:"TP"+Date.now(),
+    userId:currentUser.id,
+    email:currentUser.email,
+    amount,
+    method,
+    status:"Ожидает подтверждения",
+    created:new Date().toISOString()
+  });
+  dbSave(db);
+
+  document.getElementById("topupResult").innerHTML=
+    `<span class="status">Заявка создана</span><p>Сумма: ${money(amount)}.</p><p class="muted">Баланс будет изменён только после реального подтверждения оплаты.</p>`;
+}
+
+function render(){
+  if(!currentUser)return;
+  const user=userNow();
+  if(!user)return;
+  currentUser=user;
+  document.getElementById("balance").textContent=money(user.balance);
+  renderOrders();
+  if(user.role==="admin")renderAdmin();
+}
+
+init();
+</script>
+</body>
+</html>
